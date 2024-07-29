@@ -1,0 +1,147 @@
+Select *
+From Google_CaseStudies..June_2023;
+
+-- Changing the datatypes of tables to match the datatype of every table
+Alter Table June_2023 alter Column start_station_id nvarchar(255); 
+Alter Table June_2023 alter Column end_station_id nvarchar(255);
+Alter Table June_2023 alter Column ride_length time(0);
+
+Alter Table July_2023 alter Column start_station_id nvarchar(255); 
+Alter Table July_2023 alter Column end_station_id nvarchar(255);
+Alter Table July_2023 alter Column ride_length time(0);
+
+Alter Table August_2023 alter Column start_station_id nvarchar(255); 
+Alter Table August_2023 alter Column end_station_id nvarchar(255);
+Alter Table August_2023 alter Column ride_length time(0);
+
+Alter Table September_2023 alter Column start_station_id nvarchar(255); 
+Alter Table September_2023 alter Column end_station_id nvarchar(255);
+Alter Table September_2023 alter Column ride_length time(0);
+
+Alter Table October_2023 alter Column start_station_id nvarchar(255); 
+Alter Table October_2023 alter Column end_station_id nvarchar(255);
+Alter Table October_2023 alter Column ride_length time(0);
+
+Alter Table November_2023 alter Column start_station_id nvarchar(255); 
+Alter Table November_2023 alter Column end_station_id nvarchar(255);
+Alter Table November_2023 alter Column ride_length time(0);
+
+Alter Table December_2023 alter Column start_station_id nvarchar(255); 
+Alter Table December_2023 alter Column ride_length time(0);
+
+Alter Table January_2024 alter Column start_station_id nvarchar(255); 
+Alter Table January_2024 alter Column ride_length time(0);
+
+Alter Table February_2024 alter Column start_station_id nvarchar(255); 
+Alter Table February_2024 alter Column ride_length time(0);
+
+Alter Table March_2024 alter Column start_station_id nvarchar(255); 
+Alter Table March_2024 alter Column ride_length time(0);
+
+Alter Table April_2024 alter Column end_station_id nvarchar(255);
+Alter Table April_2024 alter Column ride_length time(0);
+
+Alter Table May_2024 alter Column ride_length time(0);
+
+-- Creating a new table by consolidating results from all the tables
+INSERT INTO Total_results
+Select [ride_id], [rideable_type], [started_at], [ended_at], [ride_length], [day_of_week], [start_station_name], [start_station_id], [end_station_name], [end_station_id], [member_casual]
+From Google_CaseStudies..June_2023
+Union
+Select [ride_id], [rideable_type], [started_at], [ended_at], [ride_length], [day_of_week], [start_station_name], [start_station_id], [end_station_name], [end_station_id], [member_casual]
+From Google_CaseStudies..July_2023
+Union
+Select [ride_id], [rideable_type], [started_at], [ended_at], [ride_length], [day_of_week], [start_station_name], [start_station_id], [end_station_name], [end_station_id], [member_casual]
+From Google_CaseStudies..August_2023
+Union
+Select [ride_id], [rideable_type], [started_at], [ended_at], [ride_length], [day_of_week], [start_station_name], [start_station_id], [end_station_name], [end_station_id], [member_casual]
+From Google_CaseStudies..September_2023
+Union
+Select [ride_id], [rideable_type], [started_at], [ended_at], [ride_length], [day_of_week], [start_station_name], [start_station_id], [end_station_name], [end_station_id], [member_casual]
+From Google_CaseStudies..October_2023
+Union
+Select [ride_id], [rideable_type], [started_at], [ended_at], [ride_length], [day_of_week], [start_station_name], [start_station_id], [end_station_name], [end_station_id], [member_casual]
+From Google_CaseStudies..November_2023
+Union
+Select [ride_id], [rideable_type], [started_at], [ended_at], [ride_length], [day_of_week], [start_station_name], [start_station_id], [end_station_name], [end_station_id], [member_casual]
+From Google_CaseStudies..December_2023
+Union
+Select [ride_id], [rideable_type], [started_at], [ended_at], [ride_length], [day_of_week], [start_station_name], [start_station_id], [end_station_name], [end_station_id], [member_casual]
+From Google_CaseStudies..January_2024
+Union
+Select [ride_id], [rideable_type], [started_at], [ended_at], [ride_length], [day_of_week], [start_station_name], [start_station_id], [end_station_name], [end_station_id], [member_casual]
+From Google_CaseStudies..February_2024
+Union
+Select [ride_id], [rideable_type], [started_at], [ended_at], [ride_length], [day_of_week], [start_station_name], [start_station_id], [end_station_name], [end_station_id], [member_casual]
+From Google_CaseStudies..March_2024
+Union
+Select [ride_id], [rideable_type], [started_at], [ended_at], [ride_length], [day_of_week], [start_station_name], [start_station_id], [end_station_name], [end_station_id], [member_casual]
+From Google_CaseStudies..April_2024
+Union
+Select [ride_id], [rideable_type], [started_at], [ended_at], [ride_length], [day_of_week], [start_station_name], [start_station_id], [end_station_name], [end_station_id], [member_casual]
+From Google_CaseStudies..May_2024
+Order by started_at;
+
+-- Adjusting the datatype of the consolidated table
+Alter table Total_Results Alter column ride_length time(0);
+
+-- Querying the new table
+Select *
+From Google_CaseStudies..Total_Results
+Order by started_at;
+
+-- Number of rides by each type of bike 
+Select rideable_type, COUNT(rideable_type) as number_of_rides, member_casual
+From Google_CaseStudies..Total_Results
+Group by rideable_type, member_casual;
+
+-- Number of Rides by customer type
+Select member_casual, COUNT(member_casual) as number_of_rides
+From Google_CaseStudies..Total_Results
+Group by member_casual;
+
+-- Avg ride length by customer type
+Select member_casual, CAST(DATEADD(ms,AVG(CAST(DATEDIFF(ms, '00:00:00', ISNULL(ride_length, '00:00:00')) as bigint)), '00:00:00')  as TIME(0)) as 'avg_time'
+From Google_CaseStudies..Total_Results
+Group by member_casual;
+
+-- Average ride_length for users by day_of_week
+Select Datename(dw,day_of_week) as Day, CAST(DATEADD(ms,AVG(CAST(DATEDIFF(ms, '00:00:00', ISNULL(ride_length, '00:00:00')) as bigint)), '00:00:00')  as TIME(0)) as 'avg_time'
+From Google_CaseStudies..Total_Results
+Group by day_of_week
+Order by avg_time desc;
+
+-- Mean of ride length
+Select Cast(CAST(DATEADD(ms,AVG(CAST(DATEDIFF(ms, '00:00:00', ISNULL(ride_length, '00:00:00')) as bigint)), '00:00:00')  as TIME(0)) as nvarchar(50)) as 'avg_time'
+From Google_CaseStudies..Total_Results;
+
+-- Mode of day_of_week
+SELECT Datename(dw,day_of_week) as Day, COUNT(*)
+FROM  Google_CaseStudies..Total_Results
+GROUP  BY day_of_week
+ORDER  BY COUNT(*) DESC;
+
+-- Number of rides of members by Month
+Select Distinct DATENAME(mm,started_at) as month, COUNT(started_at) as number_of_rides_members
+From Google_CaseStudies..Total_Results
+Where member_casual = 'member'
+Group by DATENAME(mm,started_at)
+Order by number_of_rides_members;
+
+-- Number of rides of Casuals by Month
+Select Distinct DATENAME(mm,started_at) as Month, COUNT(started_at) as number_of_rides_casuals
+From Google_CaseStudies..Total_Results
+Where member_casual = 'casual'
+Group by DATENAME(mm,started_at)
+Order by number_of_rides_casuals;
+
+-- Total number of rides by month
+Select Distinct DATENAME(mm,started_at) as Month, COUNT(started_at) as number_of_rides, member_casual
+From Google_CaseStudies..Total_Results
+Group by DATENAME(mm,started_at), member_casual
+Order by number_of_rides;
+
+-- Number of rides by months and seasons
+Select Distinct DATENAME(mm,started_at) as Month, COUNT(started_at) as number_of_rides, member_casual,
+(Case
+	When DATENAME(mm,started_at) like 'January' or DATENAME(mm
